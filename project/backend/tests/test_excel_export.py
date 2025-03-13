@@ -66,3 +66,19 @@ def test_export_orders_no_orders(mock_db):
     assert ws.max_row == 1
 
     os.remove('orders.xlsx')
+
+def test_export_orders_from_database():
+    export_orders()
+
+    assert os.path.exists('orders.xlsx')
+
+    wb = load_workbook('orders.xlsx')
+    ws = wb.active
+
+    assert ws['A1'].value == 'Пользователь'
+    assert ws['B1'].value == 'Товар'
+    assert ws['C1'].value == 'Количество'
+    assert ws['D1'].value == 'Цена'
+    assert ws['E1'].value == 'Итого'
+
+    os.remove('orders.xlsx')

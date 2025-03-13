@@ -2,9 +2,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
-from ..database import Base, get_db, SQLALCHEMY_DATABASE_URL
+from ..database import Base, SQLALCHEMY_DATABASE_URL
 from sqlalchemy import Column, Integer, String
-from ..database import Base
 
 # Create a new engine and session for testing
 engine_test = create_engine(SQLALCHEMY_DATABASE_URL)
