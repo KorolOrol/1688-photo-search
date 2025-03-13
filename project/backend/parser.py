@@ -26,11 +26,7 @@ user_agent = UserAgent()
 #         return response.choices[0].message.content
 
 def get_free_proxies():  
-    proxies = [] 
-    with open("freeproxies.txt", "r", encoding="utf-8") as file:
-        proxies = file.readlines()
-        proxies = [line.strip() for line in proxies] 
-    return proxies  
+    pass
 
 def solve_captcha(image_url):
     pass
