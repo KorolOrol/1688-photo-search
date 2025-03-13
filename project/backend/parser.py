@@ -1,30 +1,41 @@
-from selenium import webdriver  
-from selenium.webdriver.chrome.options import Options  
-from selenium.webdriver.common.by import By  
-from selenium.webdriver.support.ui import WebDriverWait  
-from selenium.webdriver.support import expected_conditions as EC  
-from bs4 import BeautifulSoup  
-import random  
-import time  
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from fake_useragent import UserAgent
+from selenium import webdriver
+from bs4 import BeautifulSoup
+import random
+import time
+import re 
+""" 
+НЕ ЗАПУСКАТЬ!
+прокси ещё не подключены.
+может забанить на алике.
+"""
+class AliexpressParser:
+    def __init__(self):
+        self.user_agent = UserAgent()
+        self.ANTI_CAPTCHA_API_KEY = "17e0b684051a23075a3aecacec79fa3e"
+        self.driver = self._setup_driver()
 
-# Конфиг  
-ANTI_CAPTCHA_API_KEY = "17e0b684051a23075a3aecacec79fa3e"  # Получить на anti-captcha.com  
-user_agent = UserAgent()
+    def __del__(self):
+        self.driver.quit()
 
-# def get_image_keywords(image_path):  
-#     client = OpenAI(base_url ='http://127.0.0.1:1234/v1', api_key='lm-studio')
-#         prompt = open("dress.jpg")
+    def _setup_driver(self):
+        chrome_options = Options()
 
-#         response = client.chat.completions.create(
-#         model='gemma-3-4b-it',
-#         messages=[{'role': 'user', 'content': prompt}],
-#         max_tokens=-1)
+        # Настройка прокси
+        #chrome_options.add_argument(f'--proxy-server={PROXY}')
 
-#         prompt.close()
+        # Случайный User-Agent
+        chrome_options.add_argument(f'--user-agent={UserAgent.chrome}')
 
-#         return response.choices[0].message.content
+        # Скрытие автоматизации
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 
+<<<<<<< HEAD
 def get_free_proxies():  
     proxies = [] 
     with open("freeproxies.txt", "r", encoding="utf-8") as file:
@@ -32,68 +43,66 @@ def get_free_proxies():
         proxies = [line.strip() for line in proxies] 
     return proxies  
 
+=======
+        # Инициализация драйвера
+        newDriver = webdriver.Chrome(options=chrome_options)
+>>>>>>> 03f57d60952ac46c6ee7be02c5022def51ccce60
 
-def solve_captcha(image_url):
-    pass
+        # Инъекция Stealth.js
+        with open("project\\backend\\stealth.min.js", "r") as f:
+            js = f.read()
+        newDriver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {"source": js})
 
-def setup_driver():  
-    chrome_options = Options()  
+        return newDriver
+    
+    def get_image_keywords():
+        pass
 
-    # Настройка прокси  
-    #chrome_options.add_argument(f'--proxy-server={PROXY}')  
+    def get_free_proxies():
+        pass
 
-    # Случайный User-Agent  
-    chrome_options.add_argument(f'--user-agent={UserAgent.chrome}')  
+    def solve_captcha():
+        pass
 
-    # Скрытие автоматизации  
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")  
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])  
+    def parse_products_id(self, keywords):
+        try:
+            self.driver.get(f"https://aliexpress.com/wholesale?SearchText={keywords}")
 
-    # Инициализация драйвера  
-    driver = webdriver.Chrome(options=chrome_options)  
+            # Обход всплывающих окон
+            WebDriverWait(self.driver, 15).until(
+                EC.invisibility_of_element_located((By.CLASS_NAME, "poplayer-content"))
+            )
 
-    # Инъекция Stealth.js  
-    with open("project\\backend\\stealth.min.js", "r") as f:  
-        js = f.read()  
-    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {"source": js})  
+            products = self.driver.find_elements(By.CSS_SELECTOR, '[data-product-id]')      
 
-    return driver  
+            # Сбор id товаров
+            products_id = [product.get_attribute('data-product-id') for product in products]
+            
+            return products_id
 
-def get_product_info():
-    pass
+        except Exception as e:
+            print(f"Ошибка(id): {e}")
 
-def parse_products_id(url):  
-    driver = setup_driver()  
-    try:  
-        driver.get(url)  
+    #TODO: Добавить в функцию парсинг остальных полей
+    def parse_product_info(self, product_id):
+        try:
+            self.driver.get(f"https://aliexpress.com/item/{product_id}.html")
 
-        # Обход всплывающих окон  
-        WebDriverWait(driver, 15).until(  
-            EC.invisibility_of_element_located((By.CLASS_NAME, "poplayer-content"))  
-        )
+            #сбор информации
+            soup = BeautifulSoup(self.driver.page_source, features="html.parser")
+            product_name = soup.find(attrs={"data-header-mark": "true"})
+            product_price = soup.find(attrs={"data-spm":"title_floor"})
 
-        # Прокрутка для загрузки данных  
-        for _ in range(3):  
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  
-            time.sleep(random.uniform(1.5, 3))
+            return product_name.text
 
-        # Сбор информации  
-        products = driver.find_elements(By.CSS_SELECTOR, 'SnowSearchProductFeed_List__grid__wbj7b')
-        products = driver.find_elements(By.CSS_SELECTOR, '[data-product-id]')
+        except Exception as e:
+            print(f"Ошибка(info): {e}")
 
-        # Сбор id товаров
-        products_id = [product.get_attribute('data-product-id') for product in products]
-        
-        return products_id
 
-    except Exception as e:  
-        print(f"Ошибка: {e}")  
-    finally:  
-        driver.quit()  
+parser = AliexpressParser()
+keywords = "iphone 13"
 
-# Поиск по ключевым словам  
-keywords = "платье+для+девочки"
+products_id_list = parser.parse_products_id(keywords)
 
-# Использование  
-result = parse_products_id(f"https://aliexpress.com/wholesale?SearchText={keywords}")
-print (result)
+for i in products_id_list:
+    print(parser.parse_product_info(i), i)
