@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        @@include('blocks/head.html')
+        <!-- <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width",initial-scale=1.0>
+        <title>Форма входа</title>
+        <link rel="stylesheet" href="login-form.css"> -->
+    </head>
+    <body>
+        <a href="popup.html">        <div class="arrow article-card_arrow">
+            <svg class="article-card_arrow-icon" width="92" height="62">
+                <use xlink:href="assets/icons/symbols.svg#arrow">
+                    
+                </use>
+            </svg>
+        </div></a>
+        <div class="login-form">
+            <p class="header-title">1688</p>
+            <h2>Вход</h2>
+            <form>
+                <div class="form-group">
+                    <label for="name">Логин:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Войти</button>
+            </form>
+        </div>
+        <div class = footer>
+            <div class="linker">    
+                <picture class="picture">                <img  src="assets/images/cam.png"></picture>    
+       
+                 <a href="" class ="footer_btn">Поиск по фото</a>
+            </div>
+            <div class="linker">    
+                <picture class="picture">                <img  src="assets/images/todo.png"></picture>    
+       
+                 <a href="" class ="footer_btn">Результаты поиска</a>
+            </div>
+            <div class="linker">    
+                <picture class="picture">                <img  src="assets/images/create.png"></picture>    
+       
+                 <a href="" class ="footer_btn">Создание заказа</a>
+            </div>
+        </div>
+    </body>
+</html>

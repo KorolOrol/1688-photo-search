@@ -1,0 +1,128 @@
+<!-- <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вставка изображения из буфера обмена</title>
+    <style>
+        #dropZone {
+            border: 2px dashed #ccc;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            position: relative;
+        }
+        img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Вставьте изображение из буфера обмена</h1>
+    <div id="dropZone" contenteditable="true"></div>
+    <button id="uploadButton">Отправить на бэкенд</button>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+
+        dropZone.addEventListener('paste', function(event) {
+            event.preventDefault(); // Предотвращаем стандартное поведение вставки
+            const items = event.clipboardData.items;
+
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+
+                if (item.type.startsWith('image/')) {
+                    const file = item.getAsFile();
+                    const reader = new FileReader();
+
+                    reader.onload = function(event) {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        dropZone.innerHTML = ''; // Очистка области
+                        dropZone.appendChild(img); // Добавление изображения
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    console.log('Элемент не является изображением:', item.type);
+                }
+            }
+        });
+
+        // Блокируем ввод текста
+        dropZone.addEventListener('input', function(event) {
+            // Если пользователь ввел текст, мы его удаляем
+            dropZone.innerHTML = '';
+        });
+
+        document.getElementById('uploadButton').addEventListener('click', function() {
+            const imgElement = document.querySelector('#dropZone img');
+            
+            if (imgElement) {
+                const base64Image = imgElement.src.split(',')[1]; // Получаем base64 строку
+
+                fetch('https://your-backend-url.com/upload', { // Укажите ваш URL
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: base64Image }) // Отправляем изображение
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Успех:', data);
+                })
+                .catch((error) => {
+                    console.error('Ошибка:', error);
+                });
+            } else {
+                alert('Сначала вставьте изображение!');
+            }
+        });
+    </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+  <title>Вставка фото</title>
+  <style>
+      body { 
+        background-color: antiquewhite;
+        height: 346px;
+         width: 662px;
+          padding: 10px; 
+          text-align: center; 
+      }
+      #pasteArea {
+          border: 2px dashed #ccc;
+          padding: 20px;
+          margin: 10px 0;
+      }
+      #previewImage {
+          max-width: 100%;
+          max-height: 200px;
+          display: none;
+      }
+  </style>
+</head>
+<body>
+  <h2>Вставка фото</h2>
+  <div id="pasteArea">
+      <p>Нажмите Ctrl+V для вставки изображения</p>
+      <img id="previewImage" />
+  </div>
+  <button id="uploadBtn" disabled>Загрузить</button>
+
+  <script src="scripts/scriptserchphoto.js"></script>
+  <script src="scripts/popupback.js"></script>
+</body>
+</html>
