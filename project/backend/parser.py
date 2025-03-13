@@ -1,82 +1,94 @@
-import requests  
+from selenium import webdriver  
+from selenium.webdriver.chrome.options import Options  
+from selenium.webdriver.common.by import By  
+from selenium.webdriver.support.ui import WebDriverWait  
+from selenium.webdriver.support import expected_conditions as EC  
 from bs4 import BeautifulSoup  
 import random  
 import time  
 from fake_useragent import UserAgent
 
 # Конфиг  
-PROXY_LIST_URL = "https://free-proxy-list.net/"  
 ANTI_CAPTCHA_API_KEY = "17e0b684051a23075a3aecacec79fa3e"  # Получить на anti-captcha.com  
 user_agent = UserAgent()
 
-def get_image_keywords(image_path):  
-    client = OpenAI(base_url ='http://127.0.0.1:1234/v1', api_key='lm-studio')
-        prompt = open("dress.jpg")
+# def get_image_keywords(image_path):  
+#     client = OpenAI(base_url ='http://127.0.0.1:1234/v1', api_key='lm-studio')
+#         prompt = open("dress.jpg")
 
-        response = client.chat.completions.create(
-        model='gemma-3-4b-it',
-        messages=[{'role': 'user', 'content': prompt}],
-        max_tokens=-1)
+#         response = client.chat.completions.create(
+#         model='gemma-3-4b-it',
+#         messages=[{'role': 'user', 'content': prompt}],
+#         max_tokens=-1)
 
-        prompt.close()
+#         prompt.close()
 
-        return response.choices[0].message.content
+#         return response.choices[0].message.content
 
 def get_free_proxies():  
-    response = requests.get(PROXY_LIST_URL)  
-    soup = BeautifulSoup(response.text, 'html.parser')  
-    proxies = []  
-    for row in soup.select('table.table tbody tr'):  
-        cells = row.find_all('td')
-        if cells[4].text == 'elite proxy' and cells[6].text == 'yes':  
-            proxies.append(f"{cells[0].text}:{cells[1].text}")  
-    return proxies  
+    pass
 
-def solve_captcha(image_url):  
-    data = {
-        "clientKey": ANTI_CAPTCHA_API_KEY,  
-        "task": {"type": "ImageToTextTask", "body": image_url}  
-    }  
-    response = requests.post('https://api.anti-captcha.com/createTask', json=data).json()  
-    task_id = response.get('taskId')  
-    time.sleep(10)  # Ожидание решения  
-    result = requests.get(f'https://api.anti-captcha.com/getTaskResult/{task_id}').json()  
-    return result.get('solution', {}).get('text')  
+def solve_captcha(image_url):
+    pass
 
-def parse_aliexpress(product_url):  
-    #proxies = get_free_proxies()  
-    session = requests.Session(product_url)
-    headers = {
-        "User-Agent": user_agent.random,  
-        "Accept-Language": "ru-RU,ru;q=0.9",
-        "path": "/api/v1/analytics/search"
-    }
+def setup_driver():  
+    chrome_options = Options()  
 
-    for attempt in range(5):  
-        #proxy = {'http': f'http://{random.choice(proxies)}'}  
-        try:  
-            response = requests.get(product_url, headers=headers, timeout=15)  
-            # if "captcha" in response.text:  
-            #     # Обход капчи  
-            #     captcha_url = BeautifulSoup(response.text, 'html.parser').find('img', {'id': 'captcha'})['src']  
-            #     solution = solve_captcha(captcha_url)  
-            #     # Повтор запроса с решением  
-            #     response = requests.get(product_url, headers=headers, proxies=proxy, params={'captcha': solution})  
-            #     print('captcha')
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
-            return soup
+    # Настройка прокси  
+    #chrome_options.add_argument(f'--proxy-server={PROXY}')  
 
-        except Exception as e:
-            print(f"Attempt {attempt+1} failed: {e}")
-            time.sleep(random.randint(2, 7))
-    
-    return None
+    # Случайный User-Agent  
+    chrome_options.add_argument(f'--user-agent={UserAgent.chrome}')  
 
-# # Поиск по ключевым словам  
-keywords = get_image_keywords("dress.jpg").replace(" ", "+")
+    # Скрытие автоматизации  
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")  
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])  
+
+    # Инициализация драйвера  
+    driver = webdriver.Chrome(options=chrome_options)  
+
+    # Инъекция Stealth.js  
+    with open("project\\backend\\stealth.min.js", "r") as f:  
+        js = f.read()  
+    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {"source": js})  
+
+    return driver  
+
+def get_product_info():
+    pass
+
+def parse_products_id(url):  
+    driver = setup_driver()  
+    try:  
+        driver.get(url)  
+
+        # Обход всплывающих окон  
+        WebDriverWait(driver, 15).until(  
+            EC.invisibility_of_element_located((By.CLASS_NAME, "poplayer-content"))  
+        )
+
+        # Прокрутка для загрузки данных  
+        for _ in range(3):  
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  
+            time.sleep(random.uniform(1.5, 3))
+
+        # Сбор информации  
+        products = driver.find_elements(By.CSS_SELECTOR, 'SnowSearchProductFeed_List__grid__wbj7b')
+        products = driver.find_elements(By.CSS_SELECTOR, '[data-product-id]')
+
+        # Сбор id товаров
+        products_id = [product.get_attribute('data-product-id') for product in products]
+        
+        return products_id
+
+    except Exception as e:  
+        print(f"Ошибка: {e}")  
+    finally:  
+        driver.quit()  
+
+# Поиск по ключевым словам  
+keywords = "платье+для+девочки"
 
 # Использование  
-result = parse_aliexpress(f"https://aliexpress.ru/wholesale?SearchText={keywords}")
-
-print(result)
+result = parse_products_id(f"https://aliexpress.com/wholesale?SearchText={keywords}")
+print (result)

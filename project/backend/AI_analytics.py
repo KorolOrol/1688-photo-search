@@ -115,7 +115,7 @@ class SupplierRanker:
         '''
 
         response = client.chat.completions.create(
-        model='llama-3-8b-gpt-4o-ru1.0', #модель выбиралась наугад. так что лучше найти что-то адекватное
+        model='llama-3-8b-gpt-4o-ru1.0', 
         messages=[{'role': 'user', 'content': explanation_prompt}],
         temperature=0.7,
         max_tokens=-1)
