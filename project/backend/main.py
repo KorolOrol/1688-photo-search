@@ -1,10 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException
 from pytz import timezone
+from rsa import verify
 from sqlalchemy.orm import Session
 from .database import get_db
 from .models import Order, OrderItem, Product
 from .schemas import ImageRecognitionSchema, OrderCreateSchema
-from .auth import get_current_user, get_password_hash
+from .auth import get_current_user, get_password_hash, verify_password
 from .models import User
 from .schemas import UserCreateSchema, UserLoginSchema
 from datetime import datetime, timedelta
@@ -62,8 +63,13 @@ def register_user(user_data: UserCreateSchema, db: Session = Depends(get_db)):
 
 @app.post("/login")
 def login_user(login_data: UserLoginSchema, db: Session = Depends(get_db)):
+    print(login_data.email)
     user = db.query(User).filter(User.email == login_data.email).first()
-    if not user or user.hashed_password != get_password_hash(login_data.password):
+    print(user.email)
+    print(user.hashed_password)
+    print(verify_password(login_data.password, user.hashed_password))
+    if not user or not verify_password(login_data.password, user.hashed_password):
+        print("error")
         raise HTTPException(status_code=400, detail="Invalid email or password")
     SECRET_KEY = "YOUR_SECRET_KEY"  # Replace with your actual secret key
     ALGORITHM = "HS256"
@@ -71,8 +77,8 @@ def login_user(login_data: UserLoginSchema, db: Session = Depends(get_db)):
 
     token_data = {
         "sub": user.email,
-        "iat": datetime.now(timezone.utc),
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        "iat": datetime.now(timezone('UTC')),
+        "exp": datetime.now(timezone('UTC')) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }
     token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
     return {"access_token": token, "token_type": "bearer"}

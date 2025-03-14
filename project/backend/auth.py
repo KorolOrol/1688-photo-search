@@ -49,6 +49,9 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
 def get_user(db: Session, username: str):
     # Query the database for the user by username
     return db.query(UserModel).filter(UserModel.username == username).first()
