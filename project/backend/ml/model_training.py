@@ -38,7 +38,3 @@ def train_AI():
     for idx, score in enumerate(supplier_scores):
         print(f'Поставщик #{idx+1}: {score:.2f}')
 
-    #для промпта добавляем вычисленные оценки продавца
-    supplier_data['generated_rating'] = supplier_scores
-
-    print(ranker.generate_explanation(supplier_data))
