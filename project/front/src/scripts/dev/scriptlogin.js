@@ -6,7 +6,7 @@ document.getElementById('login-form').addEventListener('submit', function(event)
         username: username,
         password: password
     };
-    fetch('https://example.com/api/login', { // Замените URL на ваш бэкенд
+    fetch('http://127.0.0.1:8000/login', { // Замените URL на ваш бэкенд
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

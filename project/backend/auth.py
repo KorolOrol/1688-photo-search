@@ -8,10 +8,10 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 from .database import get_db
-from .models import UserModel   # This is your SQLAlchemy user model
+from .models import User   # This is your SQLAlchemy user model
 
 # Secret key to encode and decode JWT tokens
-SECRET_KEY = "your_secret_key"
+SECRET_KEY = "YOUR_SECRET_KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -51,7 +51,7 @@ def get_password_hash(password):
 
 def get_user(db: Session, username: str):
     # Query the database for the user by username
-    return db.query(UserModel).filter(UserModel.username == username).first()
+    return db.query(User).filter(User.username == username).first()
 
 def authenticate_user(db: Session, username: str, password: str):
     user = get_user(db, username)

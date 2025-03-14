@@ -1,13 +1,12 @@
 from fastapi import FastAPI, Depends, HTTPException
 from pytz import timezone
 from sqlalchemy.orm import Session
-from database import get_db
-from models import Order, OrderItem, Product
-from schemas import OrderCreateSchema
-from auth import get_current_user, hash_password
-from models import User
-from schemas import UserCreateSchema
-from pydantic import BaseModel
+from .database import get_db
+from .models import Order, OrderItem, Product
+from .schemas import OrderCreateSchema
+from .auth import get_current_user, get_password_hash
+from .models import User
+from .schemas import UserCreateSchema, UserLoginSchema
 from datetime import datetime, timedelta
 import jwt
 
@@ -38,21 +37,17 @@ def register_user(user_data: UserCreateSchema, db: Session = Depends(get_db)):
     new_user = User(
         username=user_data.username,
         email=user_data.email,
-        hashed_password=hash_password(user_data.password)
+        hashed_password=get_password_hash(user_data.password)
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return {"user_id": new_user.id, "message": "User registered successfully"}
 
-class UserLoginSchema(BaseModel):
-    email: str
-    password: str
-
 @app.post("/login")
 def login_user(login_data: UserLoginSchema, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == login_data.email).first()
-    if not user or user.hashed_password != hash_password(login_data.password):
+    if not user or user.hashed_password != get_password_hash(login_data.password):
         raise HTTPException(status_code=400, detail="Invalid email or password")
     SECRET_KEY = "YOUR_SECRET_KEY"  # Replace with your actual secret key
     ALGORITHM = "HS256"
