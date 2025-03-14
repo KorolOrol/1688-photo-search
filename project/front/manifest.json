@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "My Chrome Extension",
+    "name": "Intensive Extension",
     "version": "1.0",
-    "description": "A simple Chrome extension",
+    "description": "From super guys",
     "permissions": [
       "storage"
     ],
