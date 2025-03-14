@@ -6,7 +6,7 @@ document.getElementById('register-form').addEventListener('submit', function(eve
         username: username,
         password: password
     };
-    fetch('https://example.com/api/register', { // Замените URL на ваш бэкенд
+    fetch('http://127.0.0.1:8000/register', { // Замените URL на ваш бэкенд
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
