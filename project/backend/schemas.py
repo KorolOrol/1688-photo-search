@@ -9,10 +9,12 @@ class OrderCreateSchema(BaseModel):
     items: List[OrderItemCreateSchema]
 
 class UserCreateSchema(BaseModel):
-    username: str
     email: str
     password: str
 
 class UserLoginSchema(BaseModel):
     email: str
     password: str
+
+class ImageRecognitionSchema(BaseModel):
+    image: str

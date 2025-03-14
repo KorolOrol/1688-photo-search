@@ -3,14 +3,31 @@ from pytz import timezone
 from sqlalchemy.orm import Session
 from .database import get_db
 from .models import Order, OrderItem, Product
-from .schemas import OrderCreateSchema
+from .schemas import ImageRecognitionSchema, OrderCreateSchema
 from .auth import get_current_user, get_password_hash
 from .models import User
 from .schemas import UserCreateSchema, UserLoginSchema
 from datetime import datetime, timedelta
 import jwt
+from fastapi import UploadFile, File, HTTPException
+import shutil
+import os
+from .image_recognition import send_image_recognition_request
+from .ml.parser import AliexpressParser
 
 app = FastAPI()
+
+from fastapi.middleware.cors import CORSMiddleware
+import base64
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Можно указать конкретные домены вместо "*"
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.post("/orders/create")
 def create_order(order: OrderCreateSchema, db: Session = Depends(get_db), user=Depends(get_current_user)):
@@ -35,7 +52,6 @@ def register_user(user_data: UserCreateSchema, db: Session = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     new_user = User(
-        username=user_data.username,
         email=user_data.email,
         hashed_password=get_password_hash(user_data.password)
     )
@@ -61,3 +77,18 @@ def login_user(login_data: UserLoginSchema, db: Session = Depends(get_db)):
     token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
     return {"access_token": token, "token_type": "bearer"}
 
+@app.post("/products/search-by-photo")
+async def search_by_photo(image: ImageRecognitionSchema):
+    base64_string = image.image
+    if not base64_string:
+        raise HTTPException(status_code=400, detail="No image provided")
+    print("Received image")
+    image_recognition_url = "http://127.0.0.1:1234/v1/chat/completions"
+    try:
+        keywords = send_image_recognition_request(image.image, image_recognition_url)
+        parser = AliexpressParser()
+        products = parser.parse_products_cards(keywords)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return {"keywords": keywords, "products": products}

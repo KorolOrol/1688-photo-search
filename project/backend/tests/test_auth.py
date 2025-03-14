@@ -45,9 +45,7 @@ def create_test_user(db, username: str, password: str, disabled: bool = False):
     user = UserModel(
         username=username,
         email=username,
-        full_name=username,
         hashed_password=hashed_password,
-        disabled=disabled,
     )
     db.add(user)
     db.commit()

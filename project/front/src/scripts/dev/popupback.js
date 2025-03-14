@@ -1,5 +1,5 @@
 // Константы для backend
-const BACKEND_URL = 'https://your-backend.com/upload';
+const BACKEND_URL = 'http://127.0.0.1:8000/products/search-by-photo';
 
 // Функция конвертации Base64 в Blob
 function base64ToBlob(base64, mimeType) {

@@ -5,9 +5,8 @@ from selenium.webdriver.common.by import By
 from fake_useragent import UserAgent
 from selenium import webdriver
 from bs4 import BeautifulSoup
-import random
 import re 
-from image_recognition import send_image_recognition_request
+import time
 """ 
 НЕ ЗАПУСКАТЬ!
 прокси ещё не подключены.
@@ -118,6 +117,7 @@ class AliexpressParser:
 
     def parse_products_cards(self, keywords):
         try:
+            print("Received keywords")
             self.driver.get(f"https://aliexpress.com/wholesale?SearchText={keywords}")
 
             # Обход всплывающих окон
@@ -125,6 +125,8 @@ class AliexpressParser:
                 EC.invisibility_of_element_located((By.CLASS_NAME, "poplayer-content"))
             )
             soup = BeautifulSoup(self.driver.page_source, features="html.parser")
+            
+            time.sleep(10)
 
             products_cards = self.driver.find_elements(By.CSS_SELECTOR, '[data-product-id]') 
             products_id = [product.get_attribute('data-product-id') for product in products_cards]
@@ -133,7 +135,8 @@ class AliexpressParser:
 
             for i in range(len(products_cards)):
                 products_cards[i]['link'] = 'https://aliexpress.com/item/' + str(products_id[i]) + '.html'
-
+            
+            print(products_cards)
             return products_cards
 
         except Exception as e:

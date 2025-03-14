@@ -29,4 +29,5 @@ def send_image_recognition_request(image, url):
     }
 
     response = requests.post(url, headers=headers, json=payload)
+    print("Received response")
     return response.json()['choices'][0]['message']['content']
