@@ -2,19 +2,15 @@
 <html lang="ru">
     <head>
         @@include('blocks/head.html')
-        <!-- <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width",initial-scale=1.0>
-        <title>Форма регистрации</title>
-        <link rel="stylesheet" href="registration-form.css"> -->
     </head>
     <body>
-        <a href="popup.html">        <div class="arrow article-card_arrow">
-            <svg class="article-card_arrow-icon" width="92" height="62">
-                <use xlink:href="assets/icons/symbols.svg#arrow">
-                    
-                </use>
-            </svg>
-        </div></a>
+        <a href="popup.html">        
+            <div class="arrow article-card_arrow">
+                <svg class="article-card_arrow-icon" width="62" height="62">
+                    <use xlink:href="assets/icons/symbols.svg#arrow"></use>
+                </svg>
+            </div>
+        </a>
 
         <div class="register-form">
             <p class="header-title">1688</p>
@@ -22,31 +18,54 @@
             <form>
                 <div class="form-group">
                     <label for="name">Логин:</label>
-                    <input type="text" id="name" name="name" required>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        required
+                        minlength="3"
+                        maxlength="20"
+                        pattern="[A-Za-zА-Яа-я0-9_]+"
+                        title="Используйте буквы, цифры и нижнее подчеркивание"
+                        placeholder="Введите логин"
+                    >
                 </div>
                 <div class="form-group">
                     <label for="password">Пароль:</label>
-                    <input type="password" id="password" name="password" required>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required
+                        minlength="6"
+                        maxlength="30"
+                        placeholder="Введите пароль"
+                    >
                 </div>
                 <button type="submit">Зарегистрироваться</button>
             </form>
         </div>
-        <div class = footer>
+        <div class="footer">
             <div class="linker">    
-                <picture class="picture">                <img  src="assets/images/cam.png"></picture>    
-       
-                 <a href="" class ="footer_btn">Поиск по фото</a>
+                <picture class="picture">
+                    <img src="assets/images/cam.png">
+                </picture>    
+                <a href="serch-photo.html" class="footer_btn">Поиск по фото</a>
             </div>
             <div class="linker">    
-                <picture class="picture">                <img  src="assets/images/todo.png"></picture>    
-       
-                 <a href="" class ="footer_btn">Результаты поиска</a>
+                <picture class="picture">
+                    <img src="assets/images/todo.png">
+                </picture>    
+                <a href="" class="footer_btn">Результаты поиска</a>
             </div>
             <div class="linker">    
-                <picture class="picture">                <img  src="assets/images/create.png"></picture>    
-       
-                 <a href="" class ="footer_btn">Создание заказа</a>
+                <picture class="picture">
+                    <img src="assets/images/create.png">
+                </picture>    
+                <a href="" class="footer_btn">Создание заказа</a>
             </div>
         </div>
+        
+        <script defer src="scripts/main.js"></script>
     </body>
 </html>

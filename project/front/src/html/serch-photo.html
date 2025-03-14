@@ -112,9 +112,21 @@
           max-height: 200px;
           display: none;
       }
+      .arrow {
+        display: flex;
+        justify-content: flex-end;
+        transform: scaleX(-1);
+      }
   </style>
 </head>
 <body>
+    <a href="popup.html">        <div class="arrow article-card_arrow">
+        <svg class="article-card_arrow-icon" width="62" height="62">
+            <use xlink:href="assets/icons/symbols.svg#arrow">
+                
+            </use>
+        </svg>
+    </div></a>
   <h2>Вставка фото</h2>
   <div id="pasteArea">
       <p>Нажмите Ctrl+V для вставки изображения</p>
